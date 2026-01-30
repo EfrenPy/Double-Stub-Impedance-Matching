@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,plot]"
+
+      - name: Lint with flake8
+        run: |
+          flake8 src/double_stub --max-line-length=100 --count --show-source --statistics
+
+      - name: Type check with mypy
+        run: |
+          mypy src/double_stub
+
+      - name: Run tests with coverage
+        run: |
+          pytest -v --cov=double_stub --cov-report=term-missing --cov-fail-under=70

@@ -163,16 +163,36 @@ refactor: Extract duplicate solution removal into utility function
 Understanding the code structure will help you contribute effectively:
 
 ```
-double_stub.py
-├── Configuration Constants (lines 20-30)
-├── Utility Functions (lines 35-101)
-├── DoubleStubMatcher Class (lines 106-375)
-│   ├── Initialization
-│   ├── Admittance transformation methods
-│   ├── Objective functions for optimization
-│   └── Solution finding methods
-└── Main Program (lines 380-479)
-    └── CLI argument parsing and execution
+src/double_stub/
+    __init__.py                  # Package exports and version
+    __main__.py                  # Module entry point (python -m double_stub)
+    constants.py                 # Default configuration values
+    core.py                      # Core calculation engine (DoubleStubMatcher)
+    cli.py                       # Command-line interface
+    utils.py                     # Utility functions (cot, parsing, deduplication)
+    validation.py                # Input parameter validation
+    export.py                    # Output formatting (text, JSON, CSV, Touchstone)
+    batch.py                     # Batch processing from CSV files
+    visualization.py             # Smith chart and frequency response plots
+    frequency_sweep.py           # Frequency sweep analysis and bandwidth metrics
+
+tests/
+    conftest.py                  # Shared test fixtures
+    test_core.py                 # Core engine tests
+    test_utils.py                # Utility function tests
+    test_validation.py           # Validation tests
+    test_cli.py                  # CLI tests
+    test_export.py               # Export format tests
+    test_batch.py                # Batch processing tests
+    test_verification.py         # Solution verification tests
+    test_frequency_sweep.py      # Frequency sweep tests
+
+examples/
+    basic_matching.py            # Basic matching example
+    frequency_sweep_analysis.py  # Sweep, bandwidth, Q, group delay
+    batch_processing.py          # Loop over loads programmatically
+
+double_stub_cli.py               # Backwards compatibility wrapper
 ```
 
 ## Areas for Contribution
@@ -180,24 +200,20 @@ double_stub.py
 Here are some areas where contributions would be particularly valuable:
 
 ### High Priority
-- [ ] Unit tests for core functions
-- [ ] Input validation and better error messages
-- [ ] Performance optimization for large parameter sweeps
-- [ ] Verification function to check if solutions are valid
+- [ ] RF analysis extensions (Smith chart overlays, noise figure integration)
+- [ ] Support for lossy transmission lines (attenuation modelling)
+- [ ] Interactive web calculator (e.g., Streamlit or Panel)
 
 ### Medium Priority
-- [ ] Smith chart visualization of solutions
 - [ ] Support for unequal stub impedances
-- [ ] CSV export of results
-- [ ] Batch processing mode
-- [ ] Interactive mode for parameter input
-
-### Low Priority
-- [ ] GUI interface using tkinter or PyQt
-- [ ] Support for lossy transmission lines
 - [ ] Single-stub matching as an alternative
 - [ ] Triple-stub matching support
-- [ ] Web-based calculator version
+- [ ] GUI interface using tkinter or PyQt
+
+### Low Priority
+- [ ] Integration with commercial EDA tools (SPICE export)
+- [ ] Automated design-space exploration
+- [ ] Monte-Carlo tolerance analysis
 
 ## Questions?
 

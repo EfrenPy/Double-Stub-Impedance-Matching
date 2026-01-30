@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "double-stub"
+version = "2.5.0"
+description = "Double-stub impedance matching calculator for RF/microwave engineering"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Efren Rodriguez Rodriguez"},
+]
+keywords = ["impedance-matching", "rf-engineering", "transmission-line", "smith-chart"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "numpy>=1.19.0",
+    "scipy>=1.5.0",
+]
+
+[project.optional-dependencies]
+plot = ["matplotlib>=3.3.0"]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "flake8>=6.0",
+    "mypy>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/EfrenPy/Double-Stub-Impedance-Matching"
+Repository = "https://github.com/EfrenPy/Double-Stub-Impedance-Matching"
+Issues = "https://github.com/EfrenPy/Double-Stub-Impedance-Matching/issues"
+
+[project.scripts]
+double-stub = "double_stub.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+double_stub = ["py.typed"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["scipy.*", "matplotlib.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
