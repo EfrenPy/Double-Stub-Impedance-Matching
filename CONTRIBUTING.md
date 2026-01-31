@@ -62,12 +62,12 @@ We welcome suggestions for new features or improvements! Please create an issue 
 4. **Alternatives**: Any alternative approaches you've considered
 
 **Examples of valuable enhancements:**
-- Support for series stubs
-- Visualization of solutions on a Smith chart
-- Batch processing of multiple impedance values
-- Export results to CSV or other formats
+- Support for lossy transmission lines
+- Interactive web calculator
+- Support for unequal stub impedances
+- Single-stub or triple-stub matching alternatives
 - GUI interface
-- Verification mode to check if a solution is valid
+- Monte-Carlo tolerance analysis
 
 ### Pull Requests
 
@@ -125,16 +125,24 @@ def transform_admittance(self, admittance, distance):
 - **Modularity**: Keep functions focused on a single task
 - **DRY principle**: Don't repeat yourself - extract common code into functions
 - **Comments**: Use comments to explain *why*, not *what* (code should be self-documenting)
-- **Type hints**: Consider adding type hints for better code clarity
+- **Type hints**: All code must have type annotations; the project uses `mypy --strict`
 
 ### Testing
 
+The project uses `pytest` with a coverage threshold of 70%. Run the full CI checks locally before submitting:
+
+```bash
+flake8 src/double_stub --max-line-length=100
+mypy src/double_stub
+pytest -v --cov=double_stub --cov-report=term-missing --cov-fail-under=70
+```
+
 When adding new features:
 
-1. **Manual testing**: Test with various input parameters
+1. **Write tests**: Add tests in the `tests/` directory covering normal and edge cases
 2. **Edge cases**: Consider boundary conditions (e.g., stub length = 0, very high/low impedances)
 3. **Validation**: Verify solutions using transmission line theory or Smith chart
-4. **Documentation**: Update README.md with new usage examples if applicable
+4. **Documentation**: Update README.md and CHANGELOG.md as applicable
 
 ### Commit Messages
 

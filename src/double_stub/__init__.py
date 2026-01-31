@@ -5,7 +5,7 @@ A Python tool for calculating double-stub impedance matching solutions
 in transmission line systems.
 """
 
-__version__ = "2.5.0"
+__version__ = "2.5.1"
 
 from .constants import (
     DEFAULT_DISTANCE_BETWEEN_STUBS,

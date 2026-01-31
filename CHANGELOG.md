@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.5.1] - 2026-01-31
+
+### Added
+- Published to PyPI via trusted OIDC workflow (`pip install double-stub`).
+- PyPI installation instructions in README.
+
+### Changed
+- Smith chart visualization: shunt topology now draws an admittance grid (constant-G, constant-B) so stub additions trace along constant-conductance circles; series topology keeps the impedance grid.
+- Smith chart title indicates chart type: "Smith Chart (Admittance)" or "Smith Chart (Impedance)".
+- Grid drawing extracted into `_draw_smith_grid()` helper with `chart_type` parameter.
+- Shunt stub traces now use admittance-plane reflection coefficient `Γ_Y = (Y₀ − Y)/(Y₀ + Y)`.
+- Minimum Python version raised from 3.8 to 3.10.
+- CI matrix updated to test Python 3.10, 3.12, and 3.13.
+- Updated pinned action SHAs in publish workflow.
+- Updated example plots and documentation.
+
+### Fixed
+- Constant-reactance arcs were invisible: both arc angles evaluated to −90° producing zero-span arcs. Corrected by computing the actual second intersection point of each reactance circle with the unit circle.
+- All Smith chart grid elements (resistance circles, reactance arcs) now clipped to the unit circle via `set_clip_path`.
+- Resolved all 25 mypy strict type errors across 6 source files.
+- Fixed 5 flake8 E127 indentation warnings in visualization.py.
+- Publish workflow: `pypa/gh-action-pypi-publish` pinned SHA had no Docker image on GHCR; switched to `release/v1` tag.
+
 ## [2.5.0] - 2026-01-30
 
 ### Added

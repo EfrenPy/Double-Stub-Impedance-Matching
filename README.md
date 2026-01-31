@@ -21,7 +21,7 @@ This calculator solves the nonlinear equations to determine the required stub le
 - **Forbidden region detection**: Diagnoses when a load falls in the double-stub forbidden region
 - **Multiple output formats**: Text, JSON, and CSV export
 - **Batch processing**: Process multiple load impedances from a CSV file
-- **Smith chart visualization**: Plot solutions on the Smith chart (requires matplotlib)
+- **Smith chart visualization**: Plot solutions on the Smith chart with automatic admittance/impedance grid selection (requires matplotlib)
 - **Input validation**: Comprehensive parameter validation with clear error messages
 - **Configurable max stub length**: Limit stub lengths to a specified maximum
 - **Flexible configuration**: Command-line interface for easy parameter specification
@@ -35,7 +35,18 @@ This calculator solves the nonlinear equations to determine the required stub le
 - NumPy
 - SciPy
 
-### Setup
+### From PyPI
+
+```bash
+pip install double-stub
+```
+
+With plotting support (Smith chart, frequency response):
+```bash
+pip install double-stub[plot]
+```
+
+### From Source
 
 1. Clone this repository:
 ```bash
@@ -48,7 +59,7 @@ cd Double-Stub-Impedance-Matching
 pip install -e .
 ```
 
-For plotting support (Smith chart, frequency response):
+For plotting support:
 ```bash
 pip install -e ".[plot]"
 ```
@@ -56,11 +67,6 @@ pip install -e ".[plot]"
 For development (tests, linting, type checking):
 ```bash
 pip install -e ".[dev]"
-```
-
-Or install dependencies manually:
-```bash
-pip install numpy scipy
 ```
 
 ## Usage
@@ -294,7 +300,7 @@ src/double_stub/
     export.py                    # Output formatting (text, JSON, CSV, Touchstone)
     batch.py                     # Batch processing from CSV files
     visualization.py             # Smith chart and frequency response plots
-    frequency_sweep.py           # Frequency sweep analysis
+    frequency_sweep.py           # Frequency sweep analysis and bandwidth metrics
 
 tests/
     conftest.py                  # Shared test fixtures
@@ -306,6 +312,12 @@ tests/
     test_batch.py                # Batch processing tests
     test_verification.py         # Solution verification tests
     test_frequency_sweep.py      # Frequency sweep tests
+    test_visualization.py        # Visualization tests
+
+examples/
+    basic_matching.py            # Basic matching example
+    frequency_sweep_analysis.py  # Sweep, bandwidth, Q, group delay
+    batch_processing.py          # Loop over loads programmatically
 
 double_stub_cli.py               # Backwards compatibility wrapper
 ```

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "double-stub"
-version = "2.5.0"
+version = "2.5.1"
 description = "Double-stub impedance matching calculator for RF/microwave engineering"
 readme = "README.md"
 license = {text = "MIT"}
