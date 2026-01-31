@@ -219,6 +219,20 @@ Solution 2:
   Return Loss:              113.98 dB
 ```
 
+## Example Plots
+
+### Smith Chart
+
+The Smith chart shows the impedance transformation path for each matching solution, from the load point (circle) to the matched point (square) at the center:
+
+![Smith Chart](examples/smith_chart.png)
+
+### Frequency Response
+
+The frequency response plot shows |S11|, VSWR, and return loss across a 0.5--1.5 GHz band for each solution:
+
+![Frequency Response](examples/frequency_response.png)
+
 ## Theory
 
 ### Double-Stub Matching Principle
