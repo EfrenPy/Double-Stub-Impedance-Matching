@@ -3,7 +3,7 @@
 import argparse
 import logging
 import sys
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from .constants import (
     DEFAULT_DISTANCE_BETWEEN_STUBS,
@@ -192,12 +192,13 @@ def _run_single(args: argparse.Namespace) -> int:
             'max_length': args.max_length,
         }
 
+        vr_dicts = cast(List[Dict[str, Any]], verification_results)
         if args.output_format == 'json':
-            print(format_json(solutions, config, verification_results))
+            print(format_json(solutions, config, vr_dicts))
         elif args.output_format == 'csv':
-            print(format_csv(solutions, config, verification_results), end='')
+            print(format_csv(solutions, config, vr_dicts), end='')
         else:
-            print(format_text(solutions, config, verification_results))
+            print(format_text(solutions, config, vr_dicts))
 
         # Handle plotting
         if args.plot or args.save_plot:

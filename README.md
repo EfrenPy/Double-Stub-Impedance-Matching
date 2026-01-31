@@ -31,7 +31,7 @@ This calculator solves the nonlinear equations to determine the required stub le
 
 ### Prerequisites
 
-- Python 3.8 or higher
+- Python 3.10 or higher
 - NumPy
 - SciPy
 
@@ -223,7 +223,7 @@ Solution 2:
 
 ### Smith Chart
 
-The Smith chart shows the impedance transformation path for each matching solution, from the load point (circle) to the matched point (square) at the center:
+The Smith chart shows the transformation path for each matching solution, from the load point (circle) to the matched point (square) at the center. For shunt stub topologies, an admittance chart is used so that stub additions trace along constant-conductance circles; for series topologies, an impedance chart is used:
 
 ![Smith Chart](examples/smith_chart.png)
 
@@ -314,10 +314,9 @@ double_stub_cli.py               # Backwards compatibility wrapper
 
 Planned features and improvements:
 
-- Bandwidth metrics (3 dB, 10 dB RL, VSWR < 2), group delay, and solution ranking
-- PyPI publishing via trusted OIDC workflow
 - Lossy transmission line support (attenuation modelling)
 - Interactive web calculator
+- Support for unequal stub impedances
 
 ## Contributing
 

@@ -64,7 +64,7 @@ class FrequencySweepResult:
     def phase_deg(self) -> NDArray[np.floating]:
         """Unwrapped S11 phase in degrees."""
         if not hasattr(self, '_phase_deg'):
-            self._phase_deg = np.degrees(np.unwrap(
+            self._phase_deg: NDArray[np.floating] = np.degrees(np.unwrap(
                 np.angle(self.reflection_coefficient_complex)))
         return self._phase_deg
 
@@ -74,7 +74,7 @@ class FrequencySweepResult:
         if not hasattr(self, '_group_delay_ns'):
             phase_rad = np.radians(self.phase_deg)
             omega = 2 * np.pi * self.frequencies
-            self._group_delay_ns = -np.gradient(phase_rad, omega) * 1e9
+            self._group_delay_ns: NDArray[np.floating] = -np.gradient(phase_rad, omega) * 1e9
         return self._group_delay_ns
 
     def _compute_bandwidth(self, s11_threshold: float) -> float:
@@ -142,7 +142,7 @@ class FrequencySweepResult:
         return self._q_factor
 
 
-def _transform_admittance(admittance: complex,
+def _transform_admittance(admittance: 'Union[complex, NDArray[np.complexfloating]]',
                           distance_wavelengths: 'Union[float, NDArray[np.floating]]',
                           y0: float) -> 'Union[complex, NDArray[np.complexfloating]]':
     """Transform admittance along a transmission line.
@@ -155,10 +155,10 @@ def _transform_admittance(admittance: complex,
     sin_bl = np.sin(beta_l)
     numerator = y_norm * cos_bl + 1j * sin_bl
     denominator = cos_bl + 1j * sin_bl * y_norm
-    return y0 * numerator / denominator
+    return y0 * numerator / denominator  # type: ignore[return-value]
 
 
-def _transform_impedance(impedance: complex,
+def _transform_impedance(impedance: 'Union[complex, NDArray[np.complexfloating]]',
                          distance_wavelengths: 'Union[float, NDArray[np.floating]]',
                          z0: float) -> 'Union[complex, NDArray[np.complexfloating]]':
     """Transform impedance along a transmission line."""
@@ -168,7 +168,7 @@ def _transform_impedance(impedance: complex,
     sin_bl = np.sin(beta_l)
     numerator = z_norm * cos_bl + 1j * sin_bl
     denominator = cos_bl + 1j * sin_bl * z_norm
-    return z0 * numerator / denominator
+    return z0 * numerator / denominator  # type: ignore[return-value]
 
 
 def _stub_admittance(length_wavelengths: 'Union[float, NDArray[np.floating]]',

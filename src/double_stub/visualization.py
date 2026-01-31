@@ -2,13 +2,74 @@
 
 from __future__ import annotations
 
-from typing import List, Optional, Tuple, Union, TYPE_CHECKING
+from typing import Any, List, Optional, Tuple, Union, TYPE_CHECKING
 
 import numpy as np
 
 if TYPE_CHECKING:
     from .core import DoubleStubMatcher
     from .frequency_sweep import FrequencySweepResult
+
+
+def _draw_smith_grid(ax: Any, chart_type: str = 'impedance') -> None:
+    """
+    Draw Smith chart grid lines (constant-resistance/conductance circles
+    and constant-reactance/susceptance arcs) clipped to the unit circle.
+
+    Parameters
+    ----------
+    ax : matplotlib Axes
+    chart_type : str
+        'impedance' for Z-chart (R, X labels) or 'admittance' for Y-chart (G, B labels)
+    """
+    from matplotlib.patches import Arc, Circle
+
+    # Unit circle (used for clipping)
+    unit_circle = Circle((0, 0), 1, fill=False, color='black', linewidth=1.5)
+    ax.add_patch(unit_circle)
+
+    # Constant resistance/conductance circles
+    r_values = [0, 0.2, 0.5, 1.0, 2.0, 5.0]
+    for r in r_values:
+        center_x = r / (1 + r)
+        radius = 1 / (1 + r)
+        circle = Circle((center_x, 0), radius, fill=False, color='gray',
+                        linewidth=0.5, linestyle='--')
+        ax.add_patch(circle)
+        circle.set_clip_path(unit_circle)
+
+    # Constant reactance/susceptance arcs
+    x_values = [0.2, 0.5, 1.0, 2.0, 5.0]
+    for x in x_values:
+        center_x = 1.0
+        center_y = 1.0 / x
+        radius = 1.0 / x
+
+        # Intersection points of reactance circle with unit circle:
+        # P1 = (1, 0) → angle from center = -90°
+        # P2 = ((x²-1)/(x²+1), 2x/(x²+1))
+        p2_x = (x**2 - 1) / (x**2 + 1)
+        p2_y = 2 * x / (x**2 + 1)
+
+        theta1 = np.degrees(np.arctan2(0 - center_y, 1 - center_x))  # P1=(1,0): -90°
+        theta2 = np.degrees(np.arctan2(p2_y - center_y, p2_x - center_x))
+
+        # Positive reactance arc (upper half)
+        arc_pos = Arc((center_x, center_y), 2 * radius, 2 * radius,
+                      angle=0, theta1=theta2, theta2=theta1,
+                      color='gray', linewidth=0.5, linestyle='--')
+        ax.add_patch(arc_pos)
+        arc_pos.set_clip_path(unit_circle)
+
+        # Negative reactance arc (lower half, mirrored)
+        arc_neg = Arc((center_x, -center_y), 2 * radius, 2 * radius,
+                      angle=0, theta1=-theta1, theta2=-theta2,
+                      color='gray', linewidth=0.5, linestyle='--')
+        ax.add_patch(arc_neg)
+        arc_neg.set_clip_path(unit_circle)
+
+    # Center line (real axis)
+    ax.plot([-1, 1], [0, 0], color='gray', linewidth=0.5)
 
 
 def plot_smith_chart(matcher: DoubleStubMatcher,
@@ -33,7 +94,6 @@ def plot_smith_chart(matcher: DoubleStubMatcher,
     """
     try:
         import matplotlib.pyplot as plt
-        from matplotlib.patches import Arc, Circle
     except ImportError:
         raise ImportError(
             "matplotlib is required for Smith chart visualization. "
@@ -45,55 +105,24 @@ def plot_smith_chart(matcher: DoubleStubMatcher,
     ax.set_aspect('equal')
     ax.set_xlim(-1.2, 1.2)
     ax.set_ylim(-1.2, 1.2)
-    ax.set_title('Smith Chart - Double-Stub Matching')
 
-    # Draw unit circle
-    unit_circle = Circle((0, 0), 1, fill=False, color='black', linewidth=1.5)
-    ax.add_patch(unit_circle)
+    # Choose grid type based on stub topology
+    if matcher.stub_topology == 'shunt':
+        chart_type = 'admittance'
+        ax.set_title('Smith Chart (Admittance) - Double-Stub Matching')
+    else:
+        chart_type = 'impedance'
+        ax.set_title('Smith Chart (Impedance) - Double-Stub Matching')
 
-    # Draw constant resistance circles
-    r_values = [0, 0.2, 0.5, 1.0, 2.0, 5.0]
-    for r in r_values:
-        center_x = r / (1 + r)
-        radius = 1 / (1 + r)
-        circle = Circle((center_x, 0), radius, fill=False, color='gray',
-                        linewidth=0.5, linestyle='--')
-        ax.add_patch(circle)
+    _draw_smith_grid(ax, chart_type)
 
-    # Draw constant reactance arcs
-    x_values = [0.2, 0.5, 1.0, 2.0, 5.0]
-    for x in x_values:
-        if x == 0:
-            continue
-        center_x = 1.0
-        center_y = 1.0 / x
-        radius = 1.0 / x
-
-        # Calculate arc angles to clip to unit circle
-        theta1 = np.degrees(np.arctan2(-center_y, -center_x + 1))
-        theta2 = np.degrees(np.arctan2(0 - center_y, 1 - center_x))
-
-        arc_pos = Arc((center_x, center_y), 2 * radius, 2 * radius,
-                      angle=0, theta1=theta1, theta2=theta2,
-                      color='gray', linewidth=0.5, linestyle='--')
-        arc_neg = Arc((center_x, -center_y), 2 * radius, 2 * radius,
-                      angle=0, theta1=-theta2, theta2=-theta1,
-                      color='gray', linewidth=0.5, linestyle='--')
-        ax.add_patch(arc_pos)
-        ax.add_patch(arc_neg)
-
-    # Center line
-    ax.plot([-1, 1], [0, 0], color='gray', linewidth=0.5)
-
-    def impedance_to_gamma(z, z0):
+    def impedance_to_gamma(z: complex, z0: float) -> complex:
         """Convert impedance to reflection coefficient."""
         return (z - z0) / (z + z0)
 
-    def admittance_to_gamma(y, y0):
-        """Convert admittance to reflection coefficient."""
-        z = 1.0 / y if abs(y) > 1e-15 else complex(1e15, 0)
-        z0 = 1.0 / y0
-        return (z - z0) / (z + z0)
+    def admittance_to_gamma_y(y: complex, y0: float) -> complex:
+        """Admittance-plane reflection coefficient: Γ_Y = (Y0 - Y) / (Y0 + Y)."""
+        return (y0 - y) / (y0 + y)
 
     colors = ['blue', 'red', 'green', 'purple']
 
@@ -102,42 +131,40 @@ def plot_smith_chart(matcher: DoubleStubMatcher,
         label = f'Solution {sol_idx + 1}'
 
         if matcher.stub_topology == 'shunt':
-            # Trace admittance path
+            # Trace admittance path on admittance chart
             points = []
+            n_steps = 50
 
             # 1. Load admittance
-            gamma_load = admittance_to_gamma(matcher.Y_load, matcher.Y0)
+            gamma_load = admittance_to_gamma_y(matcher.Y_load, matcher.Y0)
             points.append(gamma_load)
 
             # 2. Transform to stub 1 location
-            n_steps = 50
             for k in range(1, n_steps + 1):
                 dist = matcher.l * k / n_steps
                 y = matcher.transform_admittance(matcher.Y_load, dist)
-                points.append(admittance_to_gamma(y, matcher.Y0))
+                points.append(admittance_to_gamma_y(y, matcher.Y0))
 
             # 3. Add stub 1 (move along constant conductance circle)
             y_at_stub1 = matcher.transform_admittance(matcher.Y_load, matcher.l)
-            stub1_points = []
             for k in range(n_steps + 1):
                 frac = k / n_steps
                 y = y_at_stub1 + matcher.stub_admittance(l1) * frac
-                stub1_points.append(admittance_to_gamma(y, matcher.Y0))
-            points.extend(stub1_points)
+                points.append(admittance_to_gamma_y(y, matcher.Y0))
 
             # 4. Transform to stub 2 location
             y_after_stub1 = y_at_stub1 + matcher.stub_admittance(l1)
             for k in range(1, n_steps + 1):
                 dist = matcher.d * k / n_steps
                 y = matcher.transform_admittance(y_after_stub1, dist)
-                points.append(admittance_to_gamma(y, matcher.Y0))
+                points.append(admittance_to_gamma_y(y, matcher.Y0))
 
             # 5. Add stub 2
             y_at_stub2 = matcher.transform_admittance(y_after_stub1, matcher.d)
             for k in range(n_steps + 1):
                 frac = k / n_steps
                 y = y_at_stub2 + matcher.stub_admittance(l2) * frac
-                points.append(admittance_to_gamma(y, matcher.Y0))
+                points.append(admittance_to_gamma_y(y, matcher.Y0))
 
             gammas = np.array(points)
             ax.plot(gammas.real, gammas.imag, color=color, linewidth=1.5, label=label)
@@ -148,11 +175,11 @@ def plot_smith_chart(matcher: DoubleStubMatcher,
         else:
             # Series topology: trace impedance path
             points = []
+            n_steps = 50
 
             gamma_load = impedance_to_gamma(matcher.Z_load, matcher.Z0)
             points.append(gamma_load)
 
-            n_steps = 50
             for k in range(1, n_steps + 1):
                 dist = matcher.l * k / n_steps
                 z = matcher.transform_impedance(matcher.Z_load, dist)

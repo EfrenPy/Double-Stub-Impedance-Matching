@@ -46,10 +46,10 @@ Should return valid matching solutions or indicate no solution exists.
 Returns solutions that result in a mismatch when verified.
 
 ### Environment
-- Python 3.9.7
-- NumPy 1.21.2
-- SciPy 1.7.1
-- Ubuntu 20.04
+- Python 3.12.3
+- NumPy 2.0.0
+- SciPy 1.14.0
+- Ubuntu 24.04
 ```
 
 ### Suggesting Enhancements

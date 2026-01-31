@@ -24,9 +24,11 @@ def cot(x: Union[float, NDArray[np.floating]]) -> Union[float, NDArray[np.floati
     sin_x = np.sin(x)
     cos_x = np.cos(x)
     if np.isscalar(sin_x):
-        if abs(sin_x) < 1e-15:
-            return copysign(inf, cos_x)
-        return cos_x / sin_x
+        sin_val = float(sin_x)  # type: ignore[arg-type]
+        cos_val = float(cos_x)  # type: ignore[arg-type]
+        if abs(sin_val) < 1e-15:
+            return copysign(inf, cos_val)
+        return cos_val / sin_val
     # ndarray path
     result = np.where(
         np.abs(sin_x) < 1e-15,

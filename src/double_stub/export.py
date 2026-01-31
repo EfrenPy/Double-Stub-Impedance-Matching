@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from .frequency_sweep import FrequencySweepResult
 
 
-def _json_safe_float(value: float) -> object:
+def _json_safe_float(value: float) -> Optional[float]:
     """Return None for inf/NaN values, otherwise the float itself."""
     if math.isinf(value) or math.isnan(value):
         return None
@@ -114,7 +114,7 @@ def format_json(solutions: List[Tuple[float, float]],
 
     json_solutions = []
     for i, (l1, l2) in enumerate(solutions):
-        sol = {
+        sol: Dict[str, Any] = {
             'solution_number': i + 1,
             'l1_wavelengths': float(l1),
             'l2_wavelengths': float(l2),
@@ -123,7 +123,7 @@ def format_json(solutions: List[Tuple[float, float]],
         }
         if verification_results and i < len(verification_results):
             vr = verification_results[i]
-            verification_dict = {
+            verification_dict: Dict[str, Any] = {
                 'valid': bool(vr['valid']),
                 'reflection_coefficient': float(vr['reflection_coefficient']),
                 'error': float(vr['error']),
@@ -166,8 +166,9 @@ def format_csv(solutions: List[Tuple[float, float]],
     output = io.StringIO()
     writer = csv.writer(output)
 
-    has_verification = verification_results and len(verification_results) > 0
+    has_verification = verification_results is not None and len(verification_results) > 0
     has_vswr = (has_verification
+                and verification_results is not None
                 and 'vswr' in verification_results[0])
 
     header = ['solution', 'l1_wavelengths', 'l2_wavelengths',
@@ -179,7 +180,7 @@ def format_csv(solutions: List[Tuple[float, float]],
     for i, (l1, l2) in enumerate(solutions, 1):
         row = [i, f"{l1:.6f}", f"{l2:.6f}",
                f"{l1*360:.2f}", f"{l2*360:.2f}"]
-        if has_vswr and i <= len(verification_results):
+        if has_vswr and verification_results is not None and i <= len(verification_results):
             vr = verification_results[i - 1]
             vswr_val = vr['vswr']
             rl_val = vr['return_loss_db']

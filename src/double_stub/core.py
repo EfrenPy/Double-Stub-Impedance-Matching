@@ -142,7 +142,7 @@ class DoubleStubMatcher:
         numerator = y_normalized * np.cos(beta_l) + 1j * np.sin(beta_l)
         denominator = np.cos(beta_l) + 1j * np.sin(beta_l) * y_normalized
 
-        return self.Y0 * numerator / denominator
+        return self.Y0 * numerator / denominator  # type: ignore[no-any-return]
 
     def transform_impedance(self, impedance: complex,
                             distance: float) -> complex:
@@ -167,7 +167,7 @@ class DoubleStubMatcher:
         numerator = z_normalized * np.cos(beta_l) + 1j * np.sin(beta_l)
         denominator = np.cos(beta_l) + 1j * np.sin(beta_l) * z_normalized
 
-        return self.Z0 * numerator / denominator
+        return self.Z0 * numerator / denominator  # type: ignore[no-any-return]
 
     def stub_admittance(self, length: float) -> complex:
         """
@@ -186,9 +186,9 @@ class DoubleStubMatcher:
         beta_l = 2 * np.pi * length
 
         if self.stub_type == 'short':
-            return -1j * self.Y0_stub * cot(beta_l)
+            return -1j * self.Y0_stub * cot(beta_l)  # type: ignore[return-value]
         else:
-            return 1j * self.Y0_stub * np.tan(beta_l)
+            return 1j * self.Y0_stub * np.tan(beta_l)  # type: ignore[no-any-return]
 
     def stub_impedance_series(self, length: float) -> complex:
         """
@@ -207,9 +207,9 @@ class DoubleStubMatcher:
         beta_l = 2 * np.pi * length
 
         if self.stub_type == 'short':
-            return 1j * self.Z0_stub * np.tan(beta_l)
+            return 1j * self.Z0_stub * np.tan(beta_l)  # type: ignore[no-any-return]
         else:
-            return -1j * self.Z0_stub * cot(beta_l)
+            return -1j * self.Z0_stub * cot(beta_l)  # type: ignore[return-value]
 
     def objective_first_stub(self, length: float) -> float:
         """
