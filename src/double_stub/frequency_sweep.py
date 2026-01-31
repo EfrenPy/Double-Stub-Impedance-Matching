@@ -155,7 +155,7 @@ def _transform_admittance(admittance: 'Union[complex, NDArray[np.complexfloating
     sin_bl = np.sin(beta_l)
     numerator = y_norm * cos_bl + 1j * sin_bl
     denominator = cos_bl + 1j * sin_bl * y_norm
-    return y0 * numerator / denominator  # type: ignore[return-value]
+    return y0 * numerator / denominator  # type: ignore[return-value,no-any-return]
 
 
 def _transform_impedance(impedance: 'Union[complex, NDArray[np.complexfloating]]',
@@ -168,7 +168,7 @@ def _transform_impedance(impedance: 'Union[complex, NDArray[np.complexfloating]]
     sin_bl = np.sin(beta_l)
     numerator = z_norm * cos_bl + 1j * sin_bl
     denominator = cos_bl + 1j * sin_bl * z_norm
-    return z0 * numerator / denominator  # type: ignore[return-value]
+    return z0 * numerator / denominator  # type: ignore[return-value,no-any-return]
 
 
 def _stub_admittance(length_wavelengths: 'Union[float, NDArray[np.floating]]',
@@ -268,7 +268,7 @@ def frequency_sweep(matcher: DoubleStubMatcher, l1: float, l2: float,
 
     return FrequencySweepResult(
         frequencies=frequencies,
-        reflection_coefficient_complex=gamma_complex,
+        reflection_coefficient_complex=np.asarray(gamma_complex, dtype=np.complex128),
         center_frequency=center_freq,
         l1_wavelengths_center=l1,
         l2_wavelengths_center=l2,
